@@ -76,12 +76,9 @@ public class Application extends Controller {
             }
             // Tick, send time to all connected browsers
             if ("TICK".equals(message)) {
-                // Send the current time to all EventSource sockets
-                List<EventSource> shallowCopy = new ArrayList<EventSource>(sockets); //prevent ConcurrentModificationException
-                for(EventSource es: shallowCopy) {
+                for (EventSource es : sockets) {
                     es.send(event(dateFormat.format(new Date())));
                 }
-
             }
 
         }
