@@ -3,7 +3,6 @@ package controllers;
 import play.*;
 import play.mvc.*;
 import play.libs.*;
-import play.libs.F.*;
 
 import akka.actor.*;
 
@@ -25,16 +24,12 @@ public class Application extends Controller {
     }
 
     public static Result liveClock() {
-        return ok(new EventSource() {
-            public void onConnected() {
-               clock.tell(this, null);
-            }
-        });
+        return ok(EventSource.whenConnected(es -> clock.tell(es, null)));
     }
 
     public static class Clock extends UntypedActor {
 
-        static ActorRef instance = Akka.system().actorOf(Props.create(Clock.class));
+        final static ActorRef instance = Akka.system().actorOf(Props.create(Clock.class));
 
         // Send a TICK message every 100 millis
         static {
@@ -62,11 +57,7 @@ public class Application extends Controller {
 
                 } else {
                     // Register disconnected callback
-                    eventSource.onDisconnected(new Callback0() {
-                        public void invoke() {
-                            getContext().self().tell(eventSource, null);
-                        }
-                    });
+                    eventSource.onDisconnected(() -> self().tell(eventSource, null));
                     // New browser connected
                     sockets.add(eventSource);
                     Logger.info("New browser connected (" + sockets.size() + " browsers currently connected)");
