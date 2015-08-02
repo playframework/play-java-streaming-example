@@ -1,10 +1,10 @@
-import play.Project._
-
 name := "eventsource-clock-java8"
 
 version := "1.0-SNAPSHOT"
 
-playJavaSettings
+scalaVersion := "2.11.6"
+
+lazy val root = (project in file(".")).enablePlugins(PlayJava)
 
 javacOptions ++= Seq("-source", "1.8", "-target", "1.8", "-Xlint")
 
